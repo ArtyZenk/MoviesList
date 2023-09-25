@@ -11,6 +11,10 @@ import SnapKit
 class MoviesListView: UIViewController {
     
     // MARK: - Outlets
+    private lazy var searchController: UISearchController = {
+        let search = UISearchController()
+        return search
+    }()
     
     private lazy var moviesTable: UITableView = {
         let table = UITableView(frame: .zero, style: .plain)
@@ -45,6 +49,7 @@ extension MoviesListView {
     
     private func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.searchController = searchController
         title = "Movies"
     }
 }
