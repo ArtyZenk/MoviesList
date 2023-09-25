@@ -6,9 +6,12 @@
 //
 
 import UIKit
+import SnapKit
 
-class ViewController: UIViewController {
+class MoviesListView: UIViewController {
 
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .red
