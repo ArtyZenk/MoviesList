@@ -26,7 +26,7 @@ class MoviesListView: UIViewController {
         super.viewDidLoad()
         setupHierarch()
         setupLayout()
-        setupView()
+        setupNavigationBar()
     }
 }
 
@@ -43,16 +43,20 @@ extension MoviesListView {
         }
     }
     
-    private func setupView() {
+    private func setupNavigationBar() {
+        navigationController?.navigationBar.prefersLargeTitles = true
+        title = "Movies"
     }
 }
 
 // MARK: - UITableViewDelegate
+
 extension MoviesListView: UITableViewDelegate {
 
 }
 
 // MARK: - UITableViewDataSource
+
 extension MoviesListView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         10
