@@ -11,6 +11,7 @@ import SnapKit
 class MoviesListView: UIViewController {
     
     // MARK: - Outlets
+    
     private lazy var searchController: UISearchController = {
         let search = UISearchController()
         return search
@@ -43,13 +44,13 @@ extension MoviesListView {
     
     private func setupLayout() {
         moviesTable.snp.makeConstraints { make in
-            make.top.bottom.left.right.equalTo(view)
+            make.edges.equalToSuperview()
         }
     }
     
     private func setupNavigationBar() {
-        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.searchController = searchController
+        navigationController?.navigationBar.prefersLargeTitles = true
         title = "Movies"
     }
 }
