@@ -25,6 +25,17 @@ class MoviesListView: UIViewController {
         return table
     }()
     
+    private let networkManager = NetworkManager()
+    
+    private var character: [Result]? {
+        didSet {
+            DispatchQueue.main.async {
+                self.moviesTable.reloadData()
+            }
+        }
+    }
+    
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -32,6 +43,10 @@ class MoviesListView: UIViewController {
         setupHierarch()
         setupLayout()
         setupNavigationBar()
+        
+        networkManager.getData { character in
+            self.character = character.results ?? []
+        }
     }
 }
 
@@ -65,14 +80,19 @@ extension MoviesListView: UITableViewDelegate {
 
 extension MoviesListView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        10
+        character?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "movies", for: indexPath)
         var content = cell.defaultContentConfiguration()
-        content.text = "cell \(indexPath.row)"
-        content.image = UIImage(named: "1")
+        content.text = "\(character?[indexPath.row].name ?? "error")"
+        
+        
+        let url = URL(string: (character?[indexPath.row].image)!)!
+        let data = try? Data(contentsOf: url)
+        content.image = UIImage(data: data!)
+        
         cell.contentConfiguration = content
         return cell
     }
