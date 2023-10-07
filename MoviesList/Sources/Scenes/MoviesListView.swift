@@ -11,6 +11,7 @@ import SnapKit
 class MoviesListView: UIViewController {
     
     // MARK: - Outlets
+    
     private lazy var searchController: UISearchController = {
         let search = UISearchController()
         return search
@@ -24,6 +25,17 @@ class MoviesListView: UIViewController {
         return table
     }()
     
+    private let networkManager = NetworkManager()
+    private let imageManager = ImageManager()
+    
+    private var character: [Result]? {
+        didSet {
+            DispatchQueue.main.async { [weak self] in
+                self?.moviesTable.reloadData()
+            }
+        }
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -31,6 +43,10 @@ class MoviesListView: UIViewController {
         setupHierarch()
         setupLayout()
         setupNavigationBar()
+        
+        networkManager.fetchData { character in
+            self.character = character.results ?? []
+        }
     }
 }
 
@@ -43,13 +59,13 @@ extension MoviesListView {
     
     private func setupLayout() {
         moviesTable.snp.makeConstraints { make in
-            make.top.bottom.left.right.equalTo(view)
+            make.edges.equalToSuperview()
         }
     }
     
     private func setupNavigationBar() {
-        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.searchController = searchController
+        navigationController?.navigationBar.prefersLargeTitles = true
         title = "Movies"
     }
 }
@@ -57,22 +73,32 @@ extension MoviesListView {
 // MARK: - UITableViewDelegate
 
 extension MoviesListView: UITableViewDelegate {
-
+    
 }
 
 // MARK: - UITableViewDataSource
 
 extension MoviesListView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        10
+        character?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "movies", for: indexPath)
         var content = cell.defaultContentConfiguration()
-        content.text = "cell \(indexPath.row)"
-        content.image = UIImage(named: "1")
-        cell.contentConfiguration = content
+        let currentCharacter = character?[indexPath.row]
+        
+        content.text = "\(currentCharacter?.name ?? "error")"
+        content.textProperties.font = UIFont.systemFont(ofSize: 15, weight: .bold)
+                
+        DispatchQueue.global().async { [weak self] in
+            self?.imageManager.fetchImage(from: (currentCharacter?.image)!) { data in
+                DispatchQueue.main.async {
+                    content.image = UIImage(data: data)
+                    cell.contentConfiguration = content
+                }
+            }
+        }
         return cell
     }
     
